@@ -54,12 +54,15 @@ def player_portrait(screen, player):
         screen.blit(arcadefont.render(str(player.score),True, COLOR_WHITE), (115,70))
 
 ASSETS = {
+    'intro_image'               : re_scale_image(pygame.image.load("ASSETS/level_1_intro.png"), 2.6),
+    'intro_meanwhile'           : re_scale_image(pygame.image.load("ASSETS/intro_meanwhile.png"), 1),
     'checkpoint_stop'           : re_scale_image(pygame.image.load("ASSETS/CHECKPOINT/stop.png"), 2),
     'checkpoint_go'             : re_scale_image(pygame.image.load("ASSETS/CHECKPOINT/go.png"), 2),
     'Captain America_portrait'  : re_scale_image(pygame.image.load("ASSETS/PORTRAITS/captain.png"), 2),
     'Hulk_portrait'             : re_scale_image(pygame.image.load("ASSETS/PORTRAITS/hulk.png"), 2),
-    'Guile_portrait'            : re_scale_image(pygame.image.load("ASSETS/PORTRAITS/temp.png"), 2),
-    'Jill_portrait'             : re_scale_image(pygame.image.load("ASSETS/PORTRAITS/temp.png"), 2),    
+    'Spider-Man_portrait'       : re_scale_image(pygame.image.load("ASSETS/PORTRAITS/spider.png"), 2),
+    'Guile_portrait'            : re_scale_image(pygame.image.load("ASSETS/PORTRAITS/guile.png"), 2),
+    'Jill_portrait'             : re_scale_image(pygame.image.load("ASSETS/PORTRAITS/jill.png"), 2),    
 }
 
 OBJECTS = {

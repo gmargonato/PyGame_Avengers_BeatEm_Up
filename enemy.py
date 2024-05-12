@@ -56,7 +56,7 @@ class Enemy(pygame.sprite.Sprite):
         self.animate(fps)
 
     def ai_input(self, player):
-        if self.disabled: return
+        if self.disabled or self.current_frame < 0: return
         self.distance_x = player.rect.midbottom[0] - self.rect.midbottom[0]
         self.distance_y = player.rect.midbottom[1] - self.rect.midbottom[1]
         if self.distance_x < 0: self.flip = True
@@ -137,16 +137,26 @@ class Enemy(pygame.sprite.Sprite):
                     if player.attack_type == 'KICK': self.rect.x += 25 * (-1 if self.distance_x > 0 else 1)               
         # By projectiles        
         for p in projectile_group:
-            if pygame.Rect.colliderect(self.rect, p.rect) and p.status == 1 and pygame.time.get_ticks() - self.last_hit_time > 500:
-                self.last_hit_time = pygame.time.get_ticks()
-                self.walking = False
-                self.current_frame = 0
-                self.current_action = 'KNOCKBACK'
-                self.disabled = True
-                self.hp -= 1
-                player.score += 25
+            if pygame.Rect.colliderect(self.rect, p.rect) and pygame.time.get_ticks() - self.last_hit_time > 500 and self.alive:
+                if p.type == 'web':
+                    if p.status == 1:
+                        self.current_frame = -10
+                        p.status = 0     
+                    elif p.status == 0:
+                        self.current_frame += 1
+                        if self.current_frame >= 0:
+                            p.status = -1
+                elif p.status == 1:                
+                    self.last_hit_time = pygame.time.get_ticks()
+                    self.walking = False
+                    self.disabled = True
+                    self.hp -= 1
+                    player.score += 25                                                
+                    self.current_frame = 0
+                    self.current_action = 'KNOCKBACK'
 
     def animate(self, FPS):
+        if self.current_frame < 0: return
         num_frames = len(self.animations[self.current_action])
         last_frame = num_frames - 1
         if pygame.time.get_ticks() - self.last_frame_update > FPS * 2:
@@ -204,11 +214,13 @@ class Enemy(pygame.sprite.Sprite):
 
     def draw(self, screen, grid):
 
+        if self.current_frame < 0: return
+
         # Shadow
-        shadow = pygame.mask.from_surface(pygame.transform.scale( pygame.transform.flip(self.image, False, True), (self.image.get_width(), self.image.get_height()/4)))        
+        shadow = pygame.mask.from_surface(pygame.transform.scale( pygame.transform.flip(self.image, False, False), (self.image.get_width(), self.image.get_height()/4)))        
         screen.blit(shadow.to_surface(unsetcolor=(0,0,0,0), setcolor=(0,0,0,150)), (
             self.rect.x + (self.rect.width - self.image.get_width() if self.flip else 0), 
-            self.rect.bottom-15
+            self.rect.bottom - shadow.get_rect().height - 15
         ))        
         
         # Image

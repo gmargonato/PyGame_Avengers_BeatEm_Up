@@ -3,12 +3,13 @@ import pygame
 import math, sys, math, random
 
 class Spark():
-    def __init__(self, loc, angle, speed, color, scale=1):
+    def __init__(self, loc, angle, speed, scale):
         self.loc = loc
         self.angle = angle
         self.speed = speed
+        self.initial_scale = scale
         self.scale = scale
-        self.color = color
+        self.color = (255,255,255) # White
         self.alive = True
 
     def point_towards(self, angle, rate):
@@ -38,14 +39,19 @@ class Spark():
         movement = self.calculate_movement(dt)
         self.loc[0] += movement[0]
         self.loc[1] += movement[1]
-
-        # a bunch of options to mess around with relating to angles...
-        # self.point_towards(math.pi / 2, 0.02)
-        #self.velocity_adjust(0.975, 0.2, 8, dt)
-        #self.angle += 0.1
-
         self.speed -= 0.1
         self.scale -= 0.1
+
+        # Color
+        ratio = self.scale / self.initial_scale
+        if ratio > 0.7:
+            self.color = (255, 255, 255)
+        elif 0.5 < ratio < 0.7:
+            self.color = (248, 250, 144)
+        elif 0.3 < ratio < 0.5:
+            self.color = (245, 179, 18)
+        else:
+            self.color = (240, 125, 9)
 
         if self.speed <= 0 or self.scale <= 0:
             self.alive = False

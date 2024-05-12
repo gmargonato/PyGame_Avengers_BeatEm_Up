@@ -175,7 +175,7 @@ class Player(pygame.sprite.Sprite):
                     self.attacking = -1
                     self.attack_window = 100
                     self.attack_type = None
-                    if self.attack_cycle == 3: self.cooldown = 100
+                    if self.attack_cycle == 3 or self.current_action == 'SPECIAL': self.cooldown = 100
                 if self.current_action == 'DEFEAT':                    
                     self.last_frame_update = -1
                     self.current_frame = last_frame
@@ -218,10 +218,15 @@ class Player(pygame.sprite.Sprite):
 
     def draw(self, screen, grid):
         # Shadow
-        shadow = pygame.mask.from_surface(pygame.transform.scale( pygame.transform.flip(self.image, False, True), (self.image.get_width(), self.image.get_height()/4)))        
+        # shadow = pygame.mask.from_surface(pygame.transform.scale( pygame.transform.flip(self.image, False, True), (self.image.get_width(), self.image.get_height()/4)))        
+        # screen.blit(shadow.to_surface(unsetcolor=(0,0,0,0), setcolor=(0,0,0,150)), (
+        #     self.rect.x + (self.rect.width - self.image.get_width() if self.flip else 0), 
+        #     self.rect.bottom-15
+        # ))        
+        shadow = pygame.mask.from_surface(pygame.transform.scale( pygame.transform.flip(self.image, False, False), (self.image.get_width(), self.image.get_height()/4)))        
         screen.blit(shadow.to_surface(unsetcolor=(0,0,0,0), setcolor=(0,0,0,150)), (
             self.rect.x + (self.rect.width - self.image.get_width() if self.flip else 0), 
-            self.rect.bottom-15
+            self.rect.bottom - shadow.get_rect().height - 15
         ))        
         # Sprite
         screen.blit(self.image, (            
