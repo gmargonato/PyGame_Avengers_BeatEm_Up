@@ -32,6 +32,19 @@ class Spider(Player):
             self.cooldown = 100
             self.events.append( ('web', (self.hitbox.left, self.hitbox.bottom, self.rect.bottom, self.flip) ))
 
-    def special(self, num_frames):        
-        if self.current_action == 'SPECIAL' and self.current_frame == 1:
-            self.events.append( ('shockwave', (self.hitbox.centerx, self.hitbox.top, (255,255,255)) ))
+    def special(self, num_frames):            
+        if self.current_action == 'SPECIAL':            
+            self.disabled = True    
+            if self.current_frame == 5:
+                self.rect.y -= 50
+                self.current_frame = 4
+                if self.rect.y <= -500:
+                    self.current_frame = 5
+                    self.events.append( ('webnet', None ))
+            if self.current_frame == 6:
+                self.current_frame = 5
+                self.rect.y += 50
+                if self.rect.y >= 300:
+                    self.current_frame = 7
+
+            

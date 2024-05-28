@@ -39,23 +39,11 @@ def draw_rect_alpha(surface, color, x, y, w, h):
     pygame.draw.rect(shape_surf, color, shape_surf.get_rect())
     surface.blit(shape_surf, rect)
 
-def player_portrait(screen, player):
-        # Image
-        screen.blit(ASSETS[f'{player.name}_portrait'],   (50, 50))
-        # Health Bar
-        ratio = player.hp / player.max_hp
-        pygame.draw.rect(screen, COLOR_RED,     (110,92,200,22))
-        pygame.draw.rect(screen, COLOR_YELLOW,  (110,92,200 * ratio,22))
-        pygame.draw.rect(screen, COLOR_WHITE,   pygame.Rect(110, 92, 200, 22), 2)
-        # Name & Score
-        screen.blit(arcadefont.render(player.name, True, COLOR_BLACK), (117,52))
-        screen.blit(arcadefont.render(player.name, True, COLOR_WHITE), (115,50))
-        screen.blit(arcadefont.render(str(player.score),True, COLOR_BLACK), (117,72))
-        screen.blit(arcadefont.render(str(player.score),True, COLOR_WHITE), (115,70))
-
 ASSETS = {
+    'character_selection'       : re_scale_image(pygame.image.load("ASSETS/character_selection.png"), 1),
     'intro_image'               : re_scale_image(pygame.image.load("ASSETS/level_1_intro.png"), 2.6),
-    'intro_meanwhile'           : re_scale_image(pygame.image.load("ASSETS/intro_meanwhile.png"), 1),
+    'intro_text_1'              : re_scale_image(pygame.image.load("ASSETS/intro_text_1.png"), 1),
+    'intro_text_2'              : re_scale_image(pygame.image.load("ASSETS/intro_text_2.png"), 1),
     'checkpoint_stop'           : re_scale_image(pygame.image.load("ASSETS/CHECKPOINT/stop.png"), 2),
     'checkpoint_go'             : re_scale_image(pygame.image.load("ASSETS/CHECKPOINT/go.png"), 2),
     'Captain America_portrait'  : re_scale_image(pygame.image.load("ASSETS/PORTRAITS/captain.png"), 2),
@@ -63,6 +51,7 @@ ASSETS = {
     'Spider-Man_portrait'       : re_scale_image(pygame.image.load("ASSETS/PORTRAITS/spider.png"), 2),
     'Guile_portrait'            : re_scale_image(pygame.image.load("ASSETS/PORTRAITS/guile.png"), 2),
     'Jill_portrait'             : re_scale_image(pygame.image.load("ASSETS/PORTRAITS/jill.png"), 2),    
+    'Juggernaut_portrait'             : re_scale_image(pygame.image.load("ASSETS/PORTRAITS/juggernaut.png"), 2),    
 }
 
 OBJECTS = {

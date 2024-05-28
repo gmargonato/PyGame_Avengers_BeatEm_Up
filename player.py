@@ -101,14 +101,18 @@ class Player(pygame.sprite.Sprite):
         
         # Checking for enemies attacks
         for enemy in enemies:
-            if enemy.attacking == 1 and not self.blocking:
-                if self.rect.colliderect(enemy.hitbox) and pygame.time.get_ticks() - self.last_hit_time > 500 and self.current_action not in ['THROW','SPECIAL']:
-                    self.events.append( ('hit', (enemy.hitbox.x, enemy.hitbox.y)))
-                    self.last_hit_time = pygame.time.get_ticks()
-                    self.walking = False      
-                    self.hit = True
-                    self.attack_cycle = 1
-                    self.hp -= 1
+            if enemy.attacking == 1:
+                if self.rect.colliderect(enemy.hitbox) and pygame.time.get_ticks() - self.last_hit_time > 500 and self.current_action not in ['THROW','SPECIAL']:                                        
+                    self.attacking = -1
+                    self.attack_cycle = 0
+                    self.walking = False
+                    if self.blocking:
+                        self.blocking = False                     
+                    else:
+                        self.hit = True
+                        self.hp -= 1                     
+                        self.last_hit_time = pygame.time.get_ticks()                        
+                        self.events.append( ('hit', (enemy.hitbox.x, enemy.hitbox.y)))
 
         if self.hp <= 0:
             self.disabled = True
@@ -116,18 +120,18 @@ class Player(pygame.sprite.Sprite):
             self.events.append( ('defeat',None) )
 
     def move(self, can_scroll):
-        if self.walking:
+        if self.walking:            
             keys = pygame.key.get_pressed()
             # Up
-            if keys[pygame.K_w] and self.rect.midbottom[1] > 440:                
-                self.rect.y -= self.speed      
+            if keys[pygame.K_w] and self.rect.midbottom[1] > 440:
+                self.rect.y -= self.speed
             # Down
-            if keys[pygame.K_s] and self.rect.midbottom[1] < 690:                            
+            if keys[pygame.K_s] and self.rect.midbottom[1] < 690:
                 self.rect.y += self.speed
             if can_scroll == False:
                 # Left      
-                if keys[pygame.K_a] and self.rect.midbottom[0] > 140:                
-                    self.rect.x -= self.speed                    
+                if keys[pygame.K_a] and self.rect.midbottom[0] > 140:
+                    self.rect.x -= self.speed
                 # Right
                 if keys[pygame.K_d] and self.rect.midbottom[0] < SCREEN_WIDTH-140: 
                     self.rect.x += self.speed   
@@ -175,6 +179,7 @@ class Player(pygame.sprite.Sprite):
                     self.attacking = -1
                     self.attack_window = 100
                     self.attack_type = None
+                    self.cooldown = 25
                     if self.attack_cycle == 3 or self.current_action == 'SPECIAL': self.cooldown = 100
                 if self.current_action == 'DEFEAT':                    
                     self.last_frame_update = -1
@@ -251,3 +256,16 @@ class Player(pygame.sprite.Sprite):
             pygame.draw.rect(screen, COLOR_BLACK, pygame.Rect(self.rect.midbottom[0]-25, self.rect.midbottom[1]-20, 50, 12))
             screen.blit(smallfont.render(str(self.rect.midbottom), True, COLOR_WHITE), (self.rect.midbottom[0]-25, self.rect.midbottom[1]-20))    
             
+    def portrait(self, screen):
+            # Image
+            screen.blit(ASSETS[f'{self.name}_portrait'],   (50, 50))
+            # Health Bar
+            ratio = self.hp / self.max_hp
+            pygame.draw.rect(screen, COLOR_RED,     (110,92,300,22))
+            pygame.draw.rect(screen, COLOR_YELLOW,  (110,92,300 * ratio,22))
+            pygame.draw.rect(screen, COLOR_WHITE,   pygame.Rect(110, 92, 300, 22), 2)
+            # Name & Score
+            screen.blit(arcadefont.render(self.name, True, COLOR_BLACK), (117,52))
+            screen.blit(arcadefont.render(self.name, True, COLOR_WHITE), (115,50))
+            screen.blit(arcadefont.render(str(self.score),True, COLOR_BLACK), (117,72))
+            screen.blit(arcadefont.render(str(self.score),True, COLOR_WHITE), (115,70))

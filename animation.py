@@ -5,7 +5,6 @@ from utils import *
 
 ANIMATION_LIST = {
     'lightning' : load_sprites_from_folder(f'ASSETS/LIGHTNING', scale=2, transparency=False),  
-    'hit'       : load_sprites_from_folder(f'ASSETS/HIT', scale=1, transparency=False),    
     'fade_in'   : 80,
     'fade_out'  : 600,
     'defeat'    : 600,

@@ -10,9 +10,9 @@ class World():
         self.level = level
         self.layer_0, self.layer_1, self.layer_2, self.layer_3 = self.load_level()
         self.layer_0_images  = load_sprites_from_folder('SCENARIO/SKY',MAP_SCALE)
-        self.layer_1_images  = load_sprites_from_folder('SCENARIO/BACKGROUND',  MAP_SCALE)
-        self.layer_2_images  = load_sprites_from_folder('SCENARIO/MIDGROUND',   MAP_SCALE)
-        self.layer_3_images  = load_sprites_from_folder('SCENARIO/FOREGROUND',  MAP_SCALE)
+        self.layer_1_images  = load_sprites_from_folder(f'SCENARIO/BACKGROUND/LEVEL_{self.level}',  MAP_SCALE)
+        self.layer_2_images  = load_sprites_from_folder(f'SCENARIO/MIDGROUND/LEVEL_{self.level}',   MAP_SCALE)
+        self.layer_3_images  = load_sprites_from_folder('SCENARIO/FOREGROUND/',  MAP_SCALE)
 
     def load_level(self):  
         with open(f'world_{self.level}.csv', newline='') as csvfile:
@@ -47,10 +47,13 @@ class World():
             image = self.layer_2_images[tile]
             screen.blit(image, (i*(360*MAP_SCALE) + scroll * (-1), self.layer_1_images[0].get_height()))
             
-    def draw_foreground(self, screen, scroll):
+    def draw_foreground(self, screen, scroll, can_scroll):
         # Draw Layer 3 (foreground)
         for i,tile in enumerate(self.layer_3):
             if tile >= 0:
                 image = self.layer_3_images[tile]
-                image.set_alpha(150)
+                if can_scroll == False:
+                    image.set_alpha(150)
+                else:
+                    image.set_alpha(255)
                 screen.blit(image, (i*720 + scroll * (-1), 0), special_flags=0)                

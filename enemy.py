@@ -8,6 +8,7 @@ class Enemy(pygame.sprite.Sprite):
     def __init__(self, name, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.name = name
+        self.boss = False
         self.events = []
         self.current_action = 'IDLE'
         self.current_frame = 0
@@ -56,23 +57,25 @@ class Enemy(pygame.sprite.Sprite):
         self.animate(fps)
 
     def ai_input(self, player):
-        if self.disabled or self.current_frame < 0: return
+        if self.disabled: return
         self.distance_x = player.rect.midbottom[0] - self.rect.midbottom[0]
         self.distance_y = player.rect.midbottom[1] - self.rect.midbottom[1]
-        if self.distance_x < 0: self.flip = True
+        # Look towards player
+        if self.rect.midbottom[0] < player.rect.midbottom[0] and self.attacking == -1: 
+            self.flip = False 
+        else:
+            self.flip = True
         # Check horizontal distance
         if abs(self.distance_x) > self.safe_distance:
             self.walking = True
              # Move right
             if self.distance_x > 0:
-                self.rect.x += self.speed
-                self.flip = False                
+                self.rect.x += self.speed           
             # Move left
             else: 
-                self.rect.x -= self.speed
-                self.flip = True        
+                self.rect.x -= self.speed 
         # Check vertical distance
-         # Move up
+        # Move up
         elif self.distance_y > 1:
             self.walking = True
             self.rect.y += self.speed/2
@@ -84,7 +87,7 @@ class Enemy(pygame.sprite.Sprite):
             self.walking = False
         
         # If not walking, do something else
-        if self.walking == False and player.hp > 0:
+        if self.walking == False and player.hp > 0 and self.current_frame >= 0:
             if self.attack_window <= 0:
                 attack_chance = random.randint(0,10)
                 if attack_chance == 0: self.attacking = 0 # Can start an attack
@@ -92,6 +95,7 @@ class Enemy(pygame.sprite.Sprite):
     def combat(self, FPS, player, projectile_group):
         if self.attack_window > 0: self.attack_window -= 10
         if self.blocking > 0: self.blocking -= 10
+        if self.current_frame <= -1: self.current_frame += 1
         if self.current_action == 'BLOCK' and self.blocking <= 0: self.disabled = False
         
         # Check if still Alive
@@ -112,7 +116,7 @@ class Enemy(pygame.sprite.Sprite):
 
         # Getting hit        
         # By player
-        if player.attacking == 1:
+        if player.attacking == 1 and self.current_frame >= 0:
             if self.current_action in ['IDLE','WALK']:
                 block_chance = random.randint(0,15)
                 # Chance to block
@@ -124,6 +128,7 @@ class Enemy(pygame.sprite.Sprite):
             if self.disabled == False:
                 if (
                     pygame.Rect.colliderect(self.rect, player.hitbox) 
+                    and (player.attack_type not in ['THROW','SPECIAL'])
                     and abs(self.distance_y) <= 50
                     and pygame.time.get_ticks() - self.last_hit_time > 500
                 ):
@@ -137,23 +142,28 @@ class Enemy(pygame.sprite.Sprite):
                     if player.attack_type == 'KICK': self.rect.x += 25 * (-1 if self.distance_x > 0 else 1)               
         # By projectiles        
         for p in projectile_group:
-            if pygame.Rect.colliderect(self.rect, p.rect) and pygame.time.get_ticks() - self.last_hit_time > 500 and self.alive:
-                if p.type == 'web':
-                    if p.status == 1:
-                        self.current_frame = -10
-                        p.status = 0     
-                    elif p.status == 0:
-                        self.current_frame += 1
-                        if self.current_frame >= 0:
-                            p.status = -1
-                elif p.status == 1:                
-                    self.last_hit_time = pygame.time.get_ticks()
-                    self.walking = False
-                    self.disabled = True
-                    self.hp -= 1
-                    player.score += 25                                                
-                    self.current_frame = 0
-                    self.current_action = 'KNOCKBACK'
+            if p.type == 'webnet' and 0 < self.rect.right and self.rect.left < SCREEN_WIDTH:
+                self.disabled = True
+                self.current_action = 'BLOCK'
+                if pygame.Rect.colliderect(self.rect, p.rect) and p.status == 1: self.kill()
+            else:
+                if pygame.Rect.colliderect(self.rect, p.rect) and pygame.time.get_ticks() - self.last_hit_time > 500 and self.alive:
+                    if p.type == 'web':
+                        if p.status == 1:
+                            self.current_frame = -20
+                            p.status = 0
+                        elif p.status == 0 and self.current_frame >= 0:
+                            p.status = -1                   
+                    elif p.status == 1:                
+                        self.last_hit_time = pygame.time.get_ticks()
+                        self.walking = False
+                        self.disabled = True
+                        self.hp -= 1
+                        player.score += 25                                                
+                        self.current_frame = 0
+                        self.current_action = 'KNOCKBACK'
+                    else:
+                        pass # Other projectiles
 
     def animate(self, FPS):
         if self.current_frame < 0: return
@@ -233,15 +243,15 @@ class Enemy(pygame.sprite.Sprite):
         # Portrait shows when hit
         if pygame.time.get_ticks() - self.last_hit_time < 1000 and 0 <= self.rect.centerx <= SCREEN_WIDTH:
             # Image
-            screen.blit(ASSETS[f'{self.name}_portrait'],   (SCREEN_WIDTH-80, 20))
+            screen.blit(ASSETS[f'{self.name}_portrait'],   (SCREEN_WIDTH-100, 50))
             # Health Bar
             ratio = self.hp / self.max_hp
-            pygame.draw.rect(screen, COLOR_RED,     (SCREEN_WIDTH-280,62,200,22))
-            pygame.draw.rect(screen, COLOR_YELLOW,  (SCREEN_WIDTH-280,62,200 * ratio,22))
-            pygame.draw.rect(screen, COLOR_WHITE,   pygame.Rect(SCREEN_WIDTH-280, 62, 200, 22), 2)
+            pygame.draw.rect(screen, COLOR_RED,     (SCREEN_WIDTH-300,92,200,22))
+            pygame.draw.rect(screen, COLOR_YELLOW,  (SCREEN_WIDTH-300,92,200 * ratio,22))
+            pygame.draw.rect(screen, COLOR_WHITE,   pygame.Rect(SCREEN_WIDTH-300, 92, 200, 22), 2)
             # Name & Score
-            screen.blit(arcadefont.render(self.name, True, COLOR_BLACK), (SCREEN_WIDTH-280,42))
-            screen.blit(arcadefont.render(self.name, True, COLOR_WHITE), (SCREEN_WIDTH-280,40))
+            screen.blit(arcadefont.render(self.name, True, COLOR_BLACK), (SCREEN_WIDTH-150,67))
+            screen.blit(arcadefont.render(self.name, True, COLOR_WHITE), (SCREEN_WIDTH-150,65))
             
         if grid:
             # Hitbox
