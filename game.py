@@ -12,16 +12,18 @@ from spark import *
 from captain import *
 from hulk import *
 from spider import *
+from thor import *
 from shield import *
 from web import *
 from webnet import *
 from rock import *
+from mjolnir import *
 from shockwave import *
 from enemy import *
 from juggernaut import *
 
 class Game():
-    def __init__(self, player, fps, display):  
+    def __init__(self, player, level_id, fps, display):  
 
         # Game variables      
         self.fps            = fps
@@ -32,8 +34,9 @@ class Game():
         self.can_scroll     = True
         self.screen_shake   = 0        
         self.scroll         = 20
-        self.level_id       = 1
+        self.level_id       = level_id
         self.aux_count      = 0
+        self.timer          = pygame.time.get_ticks() 
 
         # Sprite groups
         self.characters_group   = pygame.sprite.Group()
@@ -50,37 +53,44 @@ class Game():
             self.player = player
         else:
             # self.player = Captain(w=160,h=220, x=SCREEN_WIDTH/2, y=550, stance=1, action='IDLE', hp=10, score=10000)
-            self.player = Hulk(w=160,   h=230, x=SCREEN_WIDTH/2, y=550, action='IDLE', hp=10, score=10000)
+            # self.player = Hulk(w=160,   h=230, x=SCREEN_WIDTH/2, y=550, action='IDLE', hp=10, score=10000)
             # self.player = Spider(w=160, h=230, x=SCREEN_WIDTH/2, y=550, action='IDLE', hp=10, score=10000)
+            self.player = Thor(w=160,   h=230, x=SCREEN_WIDTH/2, y=550, action='IDLE', hp=10, score=10000)
         self.characters_group.add(self.player)
 
     def handle_game_events(self):
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_ESCAPE] and not self.game_over:
-            self.paused = not self.paused # Switch between True and False
-            self.aux_count = 1 if self.paused else 0
-        if keys[pygame.K_ESCAPE] and self.game_over:                        
-            self.__init__('menu')
-        if keys[pygame.K_BACKQUOTE]:                    
-            for character in self.enemies_group:
-                if not isinstance(character, Player):
-                    character.kill()
-        if keys[pygame.K_1]:
-            self.spawn_enemy(1, 'Thug')
-        if keys[pygame.K_2]:
-            self.spawn_enemy(1, 'Juggernaut')
-        if keys[pygame.K_g]:
-            self.grid = not self.grid
-            pygame.mouse.set_visible(self.grid)                
-        if self.grid: 
-            if keys[pygame.K_UP]:
-                self.fps = min(self.fps + 1, 60)
-            if keys[pygame.K_DOWN]:
-                self.fps = max(self.fps - 1, 5)
-            if keys[pygame.K_RIGHT]:
-                self.scroll += 100
-            if keys[pygame.K_LEFT]:
-                self.scroll -= 100
+        if pygame.time.get_ticks() - self.timer < 100:
+            return            
+        else:
+            self.timer = pygame.time.get_ticks()
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_ESCAPE] and not self.game_over:
+                self.paused = not self.paused # Switch between True and False
+                self.aux_count = 1 if self.paused else 0
+            if keys[pygame.K_ESCAPE] and self.game_over:                        
+                # To-do
+                pygame.quit()
+                sys.exit()  
+            if keys[pygame.K_BACKQUOTE]:                    
+                for character in self.enemies_group:
+                    if not isinstance(character, Player):
+                        character.kill()
+            if keys[pygame.K_1]:
+                self.spawn_enemy(1, 'Thug')
+            if keys[pygame.K_2]:
+                self.spawn_enemy(1, 'Juggernaut')
+            if keys[pygame.K_g]:
+                self.grid = not self.grid
+                pygame.mouse.set_visible(self.grid)                
+            if self.grid: 
+                if keys[pygame.K_UP]:
+                    self.fps = min(self.fps + 1, 60)
+                if keys[pygame.K_DOWN]:
+                    self.fps = max(self.fps - 1, 5)
+                if keys[pygame.K_RIGHT]:
+                    self.scroll += 100
+                if keys[pygame.K_LEFT]:
+                    self.scroll -= 100
     
     def end_level(self, scroll, reset):
         self.level.visited_checkpoints = []
@@ -193,6 +203,10 @@ class Game():
                 if event_type == 'rock':
                     rock = Rock(x=event_value[0], y=event_value[1], floor=event_value[2], flip=event_value[3])
                     self.projectile_group.add(rock)
+                    self.player.events.remove(event)
+                if event_type == 'mjolnir':
+                    hammer = Mjolnir(x=event_value[0], y=event_value[1], floor=event_value[2], flip=event_value[3], status=1)
+                    self.projectile_group.add(hammer)
                     self.player.events.remove(event)
                 if event_type == 'web':
                     web = Web(x=event_value[0], y=event_value[1], floor=self.player.rect.midbottom[1], flip=event_value[3])

@@ -99,14 +99,14 @@ class Player(pygame.sprite.Sprite):
                 else:
                     self.attack_cycle += 1
         
-        # Checking for enemies attacks
+        # Checking enemy attacks
         for enemy in enemies:
             if enemy.attacking == 1:
                 if self.rect.colliderect(enemy.hitbox) and pygame.time.get_ticks() - self.last_hit_time > 500 and self.current_action not in ['THROW','SPECIAL']:                                        
                     self.attacking = -1
                     self.attack_cycle = 0
                     self.walking = False
-                    if self.blocking:
+                    if self.blocking and not enemy.boss:
                         self.blocking = False                     
                     else:
                         self.hit = True
