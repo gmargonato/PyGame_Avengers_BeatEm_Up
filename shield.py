@@ -23,7 +23,7 @@ class Shield(pygame.sprite.Sprite):
         self.status = status #1: Going, 0: Retuning, -1: Floor
         self.last_frame_update = 0
 
-    def update(self, FPS, scroll):
+    def update(self, player, FPS, scroll):
         self.path.append((self.rect.x + self.rect.width // 2, self.rect.y + self.rect.height // 2))
         if len(self.path) > 50: self.path.pop(0)
         if scroll != self.initial_scroll: self.path = []

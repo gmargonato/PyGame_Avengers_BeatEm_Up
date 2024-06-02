@@ -2,28 +2,30 @@
 import pygame
 from player import *
 
+SCALE = 1.8
+
 class Thor(Player):
     def __init__(self, w, h, x, y, action, hp, score):        
         super().__init__(w, h, x, y, action, hp, score)       
-        self.name = "Thor"  
+        self.name = "Donald Blake"  
         self.animations = self.load_animations()
 
     def load_animations(self):
         animations_dict = {
-            'INTRO'         : load_sprites_from_folder(f'CHARACTERS/THOR/INTRO'),
-            'IDLE'          : load_sprites_from_folder(f'CHARACTERS/THOR/IDLE'),
-            'WALK'          : load_sprites_from_folder(f'CHARACTERS/THOR/WALK_RIGHT'),
-            'HIT'           : load_sprites_from_folder(f'CHARACTERS/THOR/HIT'),
-            'DEFEAT'        : load_sprites_from_folder(f'CHARACTERS/THOR/DEFEAT'),
-            'PUNCH1'        : load_sprites_from_folder(f'CHARACTERS/THOR/PUNCH1'),
-            'PUNCH2'        : load_sprites_from_folder(f'CHARACTERS/THOR/PUNCH2'),
-            'PUNCH3'        : load_sprites_from_folder(f'CHARACTERS/THOR/PUNCH3'),
-            'KICK1'         : load_sprites_from_folder(f'CHARACTERS/THOR/KICK1'),
-            'KICK2'         : load_sprites_from_folder(f'CHARACTERS/THOR/KICK2'),
-            'KICK3'         : load_sprites_from_folder(f'CHARACTERS/THOR/KICK3'),
-            'BLOCK'         : load_sprites_from_folder(f'CHARACTERS/THOR/BLOCK'),
-            'SPECIAL'       : load_sprites_from_folder(f'CHARACTERS/THOR/SPECIAL'),
-            'THROW'         : load_sprites_from_folder(f'CHARACTERS/THOR/THROW'),
+            'INTRO'         : load_sprites_from_folder(f'CHARACTERS/THOR/INTRO',SCALE),
+            'IDLE'          : load_sprites_from_folder(f'CHARACTERS/THOR/IDLE',SCALE),
+            'WALK'          : load_sprites_from_folder(f'CHARACTERS/THOR/WALK_RIGHT',SCALE),
+            'HIT'           : load_sprites_from_folder(f'CHARACTERS/THOR/HIT',SCALE),
+            'DEFEAT'        : load_sprites_from_folder(f'CHARACTERS/THOR/DEFEAT',SCALE),
+            'PUNCH1'        : load_sprites_from_folder(f'CHARACTERS/THOR/PUNCH1',SCALE),
+            'PUNCH2'        : load_sprites_from_folder(f'CHARACTERS/THOR/PUNCH2',SCALE),
+            'PUNCH3'        : load_sprites_from_folder(f'CHARACTERS/THOR/PUNCH3',SCALE),
+            'KICK1'         : load_sprites_from_folder(f'CHARACTERS/THOR/KICK1',SCALE),
+            'KICK2'         : load_sprites_from_folder(f'CHARACTERS/THOR/KICK2',SCALE),
+            'KICK3'         : load_sprites_from_folder(f'CHARACTERS/THOR/KICK3',SCALE),
+            'BLOCK'         : load_sprites_from_folder(f'CHARACTERS/THOR/BLOCK',SCALE),
+            'SPECIAL'       : load_sprites_from_folder(f'CHARACTERS/THOR/SPECIAL',SCALE),
+            'THROW'         : load_sprites_from_folder(f'CHARACTERS/THOR/THROW',SCALE),
         }
         return animations_dict
     

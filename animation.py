@@ -55,11 +55,7 @@ class Animation(pygame.sprite.Sprite):
             screen.blit(transition_surf, (0,0))
             # screen.blit(font.render(str(self.frames), True, COLOR_WHITE), (SCREEN_WIDTH-100, SCREEN_HEIGHT-100))
         elif self.name == 'defeat':            
-            if self.frames > 0: self.frames -= 20
+            if self.frames > 0: self.frames -= 40
             if self.frames == 0: finished = True
             transition_surf = pygame.Surface(screen.get_size())
-            pygame.draw.circle(transition_surf, (255,255,255), (screen.get_width() // 2, screen.get_height() // 2), self.frames)
-            transition_surf.set_colorkey((255,255,255))
-            screen.blit(transition_surf, (0,0))
-            # screen.blit(font.render(str(self.frames), True, COLOR_WHITE), (SCREEN_WIDTH-100, SCREEN_HEIGHT-100))
         return finished        

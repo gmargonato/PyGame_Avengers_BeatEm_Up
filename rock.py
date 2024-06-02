@@ -17,7 +17,7 @@ class Rock(pygame.sprite.Sprite):
         self.status = 1
         self.flip = flip
         
-    def update(self, scroll, fps):        
+    def update(self, player, scroll, fps):        
         # Trajectory
         self.path.append((self.rect.x + self.rect.width // 2, self.rect.y + self.rect.height // 2))
         if len(self.path) > 50: self.path.pop(0)

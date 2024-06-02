@@ -21,7 +21,7 @@ class Web(pygame.sprite.Sprite):
         self.last_frame_update = 0
         self.floor = floor
 
-    def update(self, FPS, scroll):
+    def update(self, player, FPS, scroll):
         self.path.append((self.rect.x + self.rect.width // 2, self.rect.y + self.rect.height // 2))
         if len(self.path) > 50: self.path.pop(0)
 

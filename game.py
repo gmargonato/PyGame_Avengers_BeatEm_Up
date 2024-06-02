@@ -49,28 +49,18 @@ class Game():
         self.world  = World(self.level_id)
         self.level  = Level(self.level_id)
         self.sparks = []
-        if player:
-            self.player = player
-        else:
-            # self.player = Captain(w=160,h=220, x=SCREEN_WIDTH/2, y=550, stance=1, action='IDLE', hp=10, score=10000)
-            # self.player = Hulk(w=160,   h=230, x=SCREEN_WIDTH/2, y=550, action='IDLE', hp=10, score=10000)
-            # self.player = Spider(w=160, h=230, x=SCREEN_WIDTH/2, y=550, action='IDLE', hp=10, score=10000)
-            self.player = Thor(w=160,   h=230, x=SCREEN_WIDTH/2, y=550, action='IDLE', hp=10, score=10000)
+        self.player = player
         self.characters_group.add(self.player)
 
     def handle_game_events(self):
-        if pygame.time.get_ticks() - self.timer < 100:
-            return            
-        else:
+        if pygame.time.get_ticks() - self.timer >= 100:
             self.timer = pygame.time.get_ticks()
             keys = pygame.key.get_pressed()
             if keys[pygame.K_ESCAPE] and not self.game_over:
                 self.paused = not self.paused # Switch between True and False
                 self.aux_count = 1 if self.paused else 0
             if keys[pygame.K_ESCAPE] and self.game_over:                        
-                # To-do
-                pygame.quit()
-                sys.exit()  
+                self.fps = -1
             if keys[pygame.K_BACKQUOTE]:                    
                 for character in self.enemies_group:
                     if not isinstance(character, Player):
@@ -83,10 +73,6 @@ class Game():
                 self.grid = not self.grid
                 pygame.mouse.set_visible(self.grid)                
             if self.grid: 
-                if keys[pygame.K_UP]:
-                    self.fps = min(self.fps + 1, 60)
-                if keys[pygame.K_DOWN]:
-                    self.fps = max(self.fps - 1, 5)
                 if keys[pygame.K_RIGHT]:
                     self.scroll += 100
                 if keys[pygame.K_LEFT]:
@@ -104,8 +90,8 @@ class Game():
             self.level = Level(self.level_id)
 
     def pause_menu(self):
-        if self.game_over:            
-            draw_rect_alpha(self.display, (255,0,0,255), 0,0,SCREEN_WIDTH, SCREEN_WIDTH)                
+        if self.game_over:
+            draw_rect_alpha(self.display, (255,0,0,10), 0,0,SCREEN_WIDTH, SCREEN_WIDTH)
             self.display.blit(arcadefont.render(f"Game Over", True, COLOR_BLACK), (SCREEN_WIDTH/2-48, SCREEN_HEIGHT/2))
             self.display.blit(arcadefont.render(f"Game Over", True, COLOR_WHITE), (SCREEN_WIDTH/2-50, SCREEN_HEIGHT/2))
             self.display.blit(arcadefont.render(f"Score: {self.player.score}", True, COLOR_YELLOW), (SCREEN_WIDTH/3+150, SCREEN_HEIGHT/2+50))
@@ -133,7 +119,6 @@ class Game():
                 x = SCREEN_WIDTH-150,
                 y = 0,
             )
-            self.screen_shake = 20
             self.enemies_group.add(enemy)
             self.characters_group.add(enemy)
 
@@ -229,6 +214,10 @@ class Game():
             # Enemies -------------------------------------------------------------------------- #
             for enemy in self.enemies_group:
                 enemy.update(self.fps, self.player, self.projectile_group)
+                # Screen shakes when boss enters
+                if enemy.boss and enemy.current_action == 'INTRO':
+                    if enemy.name == 'Juggernaut' and enemy.current_frame == 7: 
+                        self.screen_shake = 10
                 # Events
                 for event in enemy.events:
                     event_type  = event[0]
@@ -237,13 +226,13 @@ class Game():
                         self.generate_spark(event_value[0], event_value[1])
                         enemy.events.remove(event)
 
-            # Blit characters on screen (Players, Enemies and Bosses) -------------------------- #
+            # Blit characters on screen (Players, Enemies, and Bosses) -------------------------- #
             for character in sorted(self.characters_group, key=lambda x: x.rect.midbottom[1] ):
                 character.draw(self.display, self.grid)
             
             # Projectiles ---------------------------------------------------------------------- #
             for projectile in self.projectile_group:
-                projectile.update(self.scroll, self.fps)
+                projectile.update(self.player, self.scroll, self.fps)
                 projectile.draw(self.display, self.grid)
                 if projectile.type == 'shield':
                     if self.player.rect.colliderect(projectile.rect): 
@@ -315,7 +304,7 @@ class Game():
 
             # Animations ---------------------------------------------------------------------- #
             for animation in self.animation_group:
-                finished = animation.update(self.fps, self.display)                    
+                finished = animation.update(self.fps, self.display)
                 if finished: 
                     if animation.name == 'fade_out': self.end_level(20, False)                                  
                     if animation.name == 'defeat': self.paused = True; self.game_over = True

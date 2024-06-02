@@ -48,7 +48,7 @@ ASSETS = {
     'checkpoint_go'             : re_scale_image(pygame.image.load("ASSETS/CHECKPOINT/go.png"), 2),
     'Captain America_portrait'  : re_scale_image(pygame.image.load("ASSETS/PORTRAITS/captain.png"), 2),
     'Hulk_portrait'             : re_scale_image(pygame.image.load("ASSETS/PORTRAITS/hulk.png"), 2),
-    'Thor_portrait'             : re_scale_image(pygame.image.load("ASSETS/PORTRAITS/temp.png"), 2),
+    'Donald Blake_portrait'     : re_scale_image(pygame.image.load("ASSETS/PORTRAITS/thor.png"), 2),
     'Spider-Man_portrait'       : re_scale_image(pygame.image.load("ASSETS/PORTRAITS/spider.png"), 2),
     'Guile_portrait'            : re_scale_image(pygame.image.load("ASSETS/PORTRAITS/guile.png"), 2),
     'Jill_portrait'             : re_scale_image(pygame.image.load("ASSETS/PORTRAITS/jill.png"), 2),    

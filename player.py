@@ -117,8 +117,7 @@ class Player(pygame.sprite.Sprite):
         if self.hp <= 0:
             self.disabled = True
             self.current_action = 'DEFEAT'
-            self.events.append( ('defeat',None) )
-
+            
     def move(self, can_scroll):
         if self.walking:            
             keys = pygame.key.get_pressed()
@@ -160,7 +159,7 @@ class Player(pygame.sprite.Sprite):
         # Animation Loop
         if num_frames == 1:
             self.current_frame = 0
-        else:
+        else:            
             # Shoot Projectiles
             self.shoot(num_frames)
             # Cast Special
@@ -185,6 +184,7 @@ class Player(pygame.sprite.Sprite):
                     self.last_frame_update = -1
                     self.current_frame = last_frame
                     self.disabled = True
+                    self.events.append( ('defeat',None) )
                 
         next_action = self.current_action
 

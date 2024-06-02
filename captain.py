@@ -15,7 +15,7 @@ class Captain(Player):
             'IDLE'          : load_sprites_from_folder(f'CHARACTERS/CAPTAIN/STANCE{self.stance}/IDLE'),
             'WALK'          : load_sprites_from_folder(f'CHARACTERS/CAPTAIN/STANCE{self.stance}/WALK_RIGHT'),
             'HIT'           : load_sprites_from_folder(f'CHARACTERS/CAPTAIN/STANCE{self.stance}/HIT'),
-            'DEFEAT'        : load_sprites_from_folder(f'CHARACTERS/CAPTAIN/STANCE1/DEFEAT'),
+            'DEFEAT'        : load_sprites_from_folder(f'CHARACTERS/CAPTAIN/STANCE{self.stance}/DEFEAT'),
             'PUNCH1'        : load_sprites_from_folder(f'CHARACTERS/CAPTAIN/STANCE{self.stance}/PUNCH1'),
             'PUNCH2'        : load_sprites_from_folder(f'CHARACTERS/CAPTAIN/STANCE{self.stance}/PUNCH2'),
             'PUNCH3'        : load_sprites_from_folder(f'CHARACTERS/CAPTAIN/STANCE{self.stance}/PUNCH3'),
