@@ -77,6 +77,10 @@ class Game():
                     self.scroll += 100
                 if keys[pygame.K_LEFT]:
                     self.scroll -= 100
+                if keys[pygame.K_LEFTBRACKET]:
+                    self.player.score = 0
+                if keys[pygame.K_RIGHTBRACKET]:
+                    self.player.score += 500
     
     def end_level(self, scroll, reset):
         self.level.visited_checkpoints = []
@@ -182,20 +186,19 @@ class Game():
                 if event_type == 'shield':
                     shield = Shield(x=event_value[0], y=event_value[1], initial_scroll=self.scroll, dir=self.player.flip, floor=self.player.rect.midbottom[1], status=1)
                     self.projectile_group.add(shield)
+                    self.characters_group.add(shield)
                     self.player.events.remove(event)
                     # Chage player stance
-                    self.player.change_instance(2)
+                    self.player.change_instance(2, self.player.flip)
                 if event_type == 'rock':
                     rock = Rock(x=event_value[0], y=event_value[1], floor=event_value[2], flip=event_value[3])
                     self.projectile_group.add(rock)
-                    self.player.events.remove(event)
-                if event_type == 'mjolnir':
-                    hammer = Mjolnir(x=event_value[0], y=event_value[1], floor=event_value[2], flip=event_value[3], status=1)
-                    self.projectile_group.add(hammer)
+                    self.characters_group.add(rock)
                     self.player.events.remove(event)
                 if event_type == 'web':
                     web = Web(x=event_value[0], y=event_value[1], floor=self.player.rect.midbottom[1], flip=event_value[3])
                     self.projectile_group.add(web)
+                    self.characters_group.add(web)
                     self.player.events.remove(event)
                 if event_type == 'webnet':
                     if len(self.enemies_group) > 0:
@@ -209,6 +212,7 @@ class Game():
                     self.screen_shake = 10
                     wave = Shockwave(x = event_value[0], y=event_value[1], color=event_value[2])
                     self.projectile_group.add(wave)
+                    self.characters_group.add(wave)
                     self.player.events.remove(event)
 
             # Enemies -------------------------------------------------------------------------- #
@@ -225,15 +229,14 @@ class Game():
                     if event_type == 'hit':
                         self.generate_spark(event_value[0], event_value[1])
                         enemy.events.remove(event)
-
-            # Blit characters on screen (Players, Enemies, and Bosses) -------------------------- #
-            for character in sorted(self.characters_group, key=lambda x: x.rect.midbottom[1] ):
-                character.draw(self.display, self.grid)
-            
+                    if event_type == 'dust':
+                        anim = Animation(name='dust', transparency=False, flip=False, x=event_value[0], y=event_value[1])
+                        self.animation_group.add(anim)
+                        enemy.events.remove(event)  
+                    
             # Projectiles ---------------------------------------------------------------------- #
             for projectile in self.projectile_group:
                 projectile.update(self.player, self.scroll, self.fps)
-                projectile.draw(self.display, self.grid)
                 if projectile.type == 'shield':
                     if self.player.rect.colliderect(projectile.rect): 
                         if projectile.status == 0:
@@ -244,6 +247,10 @@ class Game():
                             projectile.kill()
                 elif projectile.type == 'rock':
                     if projectile.index == 1: self.screen_shake = 10
+
+            # Blit characters on screen (Players, Enemies, Projectiles, etc) -------------------------- #
+            for character in sorted(self.characters_group, key=lambda x: x.rect.midbottom[1] ):
+                character.draw(self.display, self.grid)
 
             # Hit particles ------------------------------------------------------------------- #
             for i, spark in sorted(enumerate(self.sparks), reverse=True):

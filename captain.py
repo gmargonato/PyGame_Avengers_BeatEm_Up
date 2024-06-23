@@ -38,9 +38,10 @@ class Captain(Player):
         if self.stance == 1 and self.current_action == 'SPECIAL' and self.current_frame == num_frames-2:
             self.events.append( ('shockwave', (self.rect.centerx, self.rect.centery, (0,255,255)) ))
 
-    def change_instance(self, instance, action='INTRO'):
+    def change_instance(self, instance, flip, action='INTRO'):
         self.__init__(w=self.width, h=self.heigth, x=self.rect.midbottom[0], y=self.rect.midbottom[1], stance=instance, action=action, hp=self.hp, score=self.score)
         self.last_frame_update = 0
+        self.flip = flip
 
     def recover(self, type):
         self.disabled = True
@@ -49,7 +50,7 @@ class Captain(Player):
         self.attacking = -1
         self.current_frame = 0
         if type == 'air':
-            action = 'RECOVER_AIR'
+            action = 'RECOVER_AIR'            
         else:
             action = 'RECOVER_FLOOR'
-        self.change_instance(1, action)
+        self.change_instance(1, self.flip, action )

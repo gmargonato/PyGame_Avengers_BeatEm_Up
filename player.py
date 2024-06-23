@@ -106,9 +106,13 @@ class Player(pygame.sprite.Sprite):
                     self.attacking = -1
                     self.attack_cycle = 0
                     self.walking = False
-                    if self.blocking and not enemy.boss:
-                        self.blocking = False                     
-                    else:
+                    if enemy.boss:
+                        if enemy.current_action == 'SLAM' and 4 >= enemy.current_frame <= 6:    
+                            if enemy.rect.centerx > self.rect.centerx:
+                                self.rect.x -= 50
+                            else:
+                                self.rect.x += 50
+                    if not self.blocking:
                         self.hit = True
                         self.hp -= 1                     
                         self.last_hit_time = pygame.time.get_ticks()                        
@@ -217,7 +221,7 @@ class Player(pygame.sprite.Sprite):
         self.hitbox.y = self.rect.y + self.heigth/4
         img_width = self.image.get_width()
         if not self.flip: 
-            self.hitbox.x = self.rect.x + (img_width/1.2)
+            self.hitbox.x = self.rect.x + (img_width/1.2) 
         else: 
             self.hitbox.x = self.rect.x - (img_width/2.2)
 

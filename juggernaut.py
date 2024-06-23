@@ -20,12 +20,14 @@ class Juggernaut(pygame.sprite.Sprite):
         self.distance_x = SCREEN_WIDTH
         self.distance_y = SCREEN_HEIGHT
         self.flip = True
-        self.safe_distance = 300
+        self.max_safe_distance = 300
+        self.min_safe_distance = 200
         
         # Actions
         self.alive = True
         self.disabled = True
         self.walking = False     
+        self.walking_dir = None
         self.blocking = 0
         self.attacking = -1 # -1: Not attacking. 0: Starting an attack. 1: Currently attacking
         self.attack_type = 0
@@ -35,14 +37,15 @@ class Juggernaut(pygame.sprite.Sprite):
         self.animations = {
             'INTRO'     : load_sprites_from_folder(f'CHARACTERS/JUGGERNAUT/INTRO'),
             'IDLE'      : load_sprites_from_folder(f'CHARACTERS/JUGGERNAUT/IDLE'),
-            'WALK'      : load_sprites_from_folder(f'CHARACTERS/JUGGERNAUT/WALK_FORWARD'),
-            'WALK_BACK' : load_sprites_from_folder(f'CHARACTERS/JUGGERNAUT/WALK_BACK'),
+            'WALK_F'    : load_sprites_from_folder(f'CHARACTERS/JUGGERNAUT/WALK_FORWARD'),
+            'WALK_B'    : load_sprites_from_folder(f'CHARACTERS/JUGGERNAUT/WALK_BACK'),
             'HIT'       : load_sprites_from_folder(f'CHARACTERS/JUGGERNAUT/HIT'),
             'DEFEAT'    : load_sprites_from_folder(f'CHARACTERS/JUGGERNAUT/DEFEAT'),
             'BLOCK'     : load_sprites_from_folder(f'CHARACTERS/JUGGERNAUT/BLOCK'),
             'ATTACK1'   : load_sprites_from_folder(f'CHARACTERS/JUGGERNAUT/ATTACK1'),
             'ATTACK2'   : load_sprites_from_folder(f'CHARACTERS/JUGGERNAUT/ATTACK2'),
             'ATTACK3'   : load_sprites_from_folder(f'CHARACTERS/JUGGERNAUT/ATTACK3'),
+            'SLAM'      : load_sprites_from_folder(f'CHARACTERS/JUGGERNAUT/GROUND_SLAM'),
             'SPECIAL'   : load_sprites_from_folder(f'CHARACTERS/JUGGERNAUT/SPECIAL'),
         }
 
@@ -67,28 +70,56 @@ class Juggernaut(pygame.sprite.Sprite):
             self.flip = False 
         else:
             self.flip = True
+        
         # Check horizontal distance
         self.distance = abs(player.rect.centerx - self.rect.centerx)
-        if abs(self.distance_x) > self.safe_distance:
+        self.walking = False
+        self.walking_dir = "FORWARD" 
+        # Check if too far away
+        if abs(self.distance_x) > self.max_safe_distance:
+            self.walking = True
             # Move right
             if self.distance_x > 0:
-                self.walking = True
-                self.rect.x += self.speed           
+                self.rect.x += self.speed         
             # Move left
-            else: 
+            else:
+                self.rect.x -= self.speed
+        # Check if too close
+        elif abs(self.distance_x) <= self.min_safe_distance:
+            if abs(self.distance_x) <= 120 and self.attack_window <= 0:
+                self.attacking = 1
+                self.current_frame = 0
+                self.current_action = 'SLAM'
+                self.disabled = True          
+                self.attack_window = 500                
+            else:
+                self.walking_dir = "BACK"
                 self.walking = True
-                self.rect.x -= self.speed 
+                if self.distance_x > 0:
+                    self.rect.x -= self.speed         
+                # Move left
+                else:
+                    self.rect.x += self.speed 
+
+        # Check if close to edge of the screen
+        x_error = 0
+        if self.rect.centerx <= 200:
+            x_error = 200 - self.rect.centerx
+        elif self.rect.centerx >= 1100:
+            x_error = 1100 - self.rect.centerx
+        if x_error != 0:
+            self.walking = False
+            self.rect.x += x_error
+
         # Check vertical distance
         # Move up
-        elif self.distance_y > 1:
+        if self.distance_y > 2:
             self.walking = True
             self.rect.y += self.speed/2
          # Move down
-        elif self.distance_y < 0:
+        elif self.distance_y < 1:
             self.walking = True
             self.rect.y -= self.speed/2
-        else:
-            self.walking = False
         
         # If not walking, do something else
         if self.walking == False and player.hp > 0:
@@ -113,17 +144,17 @@ class Juggernaut(pygame.sprite.Sprite):
         if self.attacking == 0:
             self.attacking = 1
             self.current_frame = 0
-            self.current_action = random.choice(['ATTACK1','ATTACK2','ATTACK3','SPECIAL'])
+            self.current_action = random.choice(['ATTACK1','ATTACK2','ATTACK3'])
             self.disabled = True          
             self.attack_window = 500
 
         # Getting hit        
         # By player
         if player.attacking == 1:
-            if self.current_action in ['IDLE','WALK']:
+            if self.current_action in ['IDLE','WALK_F','WALK_B']:
                 block_chance = random.randint(0,15)
                 # Chance to block
-                if block_chance == 0 and abs(self.distance_x) <= self.safe_distance:
+                if block_chance == 0 and abs(self.distance_x) <= self.max_safe_distance:
                     self.current_action = 'BLOCK'
                     self.disabled = True
                     self.blocking = 200
@@ -166,6 +197,8 @@ class Juggernaut(pygame.sprite.Sprite):
                 self.current_frame += 1  
                 if self.current_action == 'SPECIAL': 
                     self.rect.x += 25 * (-1 if self.flip else 1)
+                elif self.current_action == 'SLAM' and self.current_frame == 4: 
+                    self.events.append( ('dust', (self.rect.midbottom[0]-200, self.rect.midbottom[1]-60)) )      
                 elif self.current_action == 'INTRO':
                     self.rect.y += 70 
             else: # If it is the last frame of animation  
@@ -179,7 +212,7 @@ class Juggernaut(pygame.sprite.Sprite):
         if self.disabled:
             pass
         elif self.walking:
-            next_action = 'WALK'
+            next_action = 'WALK_F' if self.walking_dir == 'FORWARD' else 'WALK_B'
         else:
             next_action = 'IDLE'            
         
@@ -252,7 +285,7 @@ class Juggernaut(pygame.sprite.Sprite):
             pygame.draw.rect(screen, COLOR_BLACK, pygame.Rect(self.rect.x, self.rect.y-150, self.width, 60))
             screen.blit(smallfont.render(f"Action: {self.current_action} {self.current_frame}", True, COLOR_WHITE), (self.rect.x, self.rect.y-150))
             screen.blit(smallfont.render(f"Blocking: {self.blocking} | Disabled: {self.disabled}", True, COLOR_WHITE), (self.rect.x, self.rect.y-140))
-            screen.blit(smallfont.render(f"Walking: {self.walking} | Safe: {self.safe_distance}", True, COLOR_WHITE), (self.rect.x, self.rect.y-130))
+            # screen.blit(smallfont.render(f"Walking: {self.walking} | Safe: {self.safe_distance}", True, COLOR_WHITE), (self.rect.x, self.rect.y-130))
             screen.blit(smallfont.render(f"Life: {self.hp}/{self.max_hp} | Flip: {self.flip}", True, COLOR_WHITE), (self.rect.x, self.rect.y-120))
             screen.blit(smallfont.render(f"Attacking: {self.attacking} | Window: {self.attack_window}", True, COLOR_WHITE), (self.rect.x, self.rect.y-110))
             

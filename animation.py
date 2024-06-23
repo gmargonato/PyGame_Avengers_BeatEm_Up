@@ -5,6 +5,7 @@ from utils import *
 
 ANIMATION_LIST = {
     'lightning' : load_sprites_from_folder(f'ASSETS/LIGHTNING', scale=2, transparency=False),  
+    'dust'      : load_sprites_from_folder(f'ASSETS/DUST', scale=2, transparency=False),  
     'fade_in'   : 80,
     'fade_out'  : 600,
     'defeat'    : 600,
@@ -26,9 +27,14 @@ class Animation(pygame.sprite.Sprite):
         finished = False   
         current_time = pygame.time.get_ticks()
         # General purpose animations
-        if self.name in ['lightning','hit']:
+        if self.name in ['lightning','hit','dust']:
             last_frame = len(self.frames) - 1
-            MULT_FPS = 2
+            MULT_FPS_dict = {
+                'lightning' : 2,
+                'hit'       : 2,
+                'dust'      : 1,
+            }
+            MULT_FPS = MULT_FPS_dict[self.name]
             if current_time - self.last_frame_update < FPS*MULT_FPS:
                 return
             else: 

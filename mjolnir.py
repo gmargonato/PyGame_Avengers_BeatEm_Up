@@ -1,6 +1,7 @@
 
 import pygame
 import math
+import random
 from utils import *
 
 class Mjolnir(pygame.sprite.Sprite):
@@ -19,6 +20,10 @@ class Mjolnir(pygame.sprite.Sprite):
         self.index = 0
         self.rect.center = (x, y)        
 
+    def generate_lightning(self, screen):
+        x = random.randint(self.rect.left,self.rect.right)
+        pygame.draw.line(screen, COLOR_CYAN, (x, self.rect.centery), (x, self.floor),2)
+
     def update(self, player, scroll, fps):
         # Trajectory
         self.path.append((self.rect.x + self.rect.width // 2, self.rect.y + self.rect.height // 2))
@@ -27,7 +32,7 @@ class Mjolnir(pygame.sprite.Sprite):
         player_y = player.rect.centery
         dist_y = self.rect.centery - player_y
 
-        # Going
+        # Going forward
         if self.status == 1:
             self.rect.x += self.speed 
             self.speed -= 1.5
@@ -37,13 +42,12 @@ class Mjolnir(pygame.sprite.Sprite):
                 self.rect.y += 5
             if self.speed < 0 and self.rect.colliderect(player.rect): 
                 self.kill()
-        
         # Retuning
         else:
             self.rect.x -= self.speed
             if self.rect.colliderect(player.rect): 
                 self.kill()
-        
+
     def draw(self, screen, grid):
         # Shadow
         shadow = pygame.mask.from_surface(pygame.transform.scale(self.image, (self.image.get_width(), self.image.get_height()/3)))
@@ -51,7 +55,10 @@ class Mjolnir(pygame.sprite.Sprite):
 
         # Image
         screen.blit(self.image, (self.rect.x, self.rect.y))
-        
+
+        # Lightining
+        # self.generate_lightning(screen)
+
         if grid:
             # Hitbox
             pygame.draw.rect(screen, COLOR_GREEN, self.rect, 1)

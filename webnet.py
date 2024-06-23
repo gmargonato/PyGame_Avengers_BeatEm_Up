@@ -14,7 +14,7 @@ class Webnet(pygame.sprite.Sprite):
         self.enemy_y = y
         self.status = 0
         
-    def update(self, scroll, fps):        
+    def update(self, player, scroll, fps):        
         if self.status == 0:
             if self.rect.y < self.enemy_y:
                 self.rect.y += 20

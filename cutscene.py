@@ -13,7 +13,7 @@ class Cutscene():
     def run(self):     
         # Events
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_ESCAPE]:
+        if keys[pygame.K_SPACE]:
             if (self.pos_y >= -500 or self.pos_y <= -1000) and len(self.animation_group) == 0:
                 self.animation_group.add(Animation(name='fade_out', transparency=False, flip=False, x=0, y=0))
 
@@ -23,8 +23,6 @@ class Cutscene():
             self.pos_y -= 15
         else:
             self.display.blit(ASSETS['intro_text_2'], (0,0))
-            self.display.blit(arcadefont.render("Press 'ESC' to continue", True, COLOR_BLACK), (SCREEN_WIDTH-268, SCREEN_HEIGHT-48))
-            self.display.blit(arcadefont.render("Press 'ESC' to continue", True, COLOR_WHITE), (SCREEN_WIDTH-270, SCREEN_HEIGHT-50))
              
         # self.display.blit(font.render(f"[DEBUG] {self.pos_y}", True, COLOR_BLACK), (100, SCREEN_HEIGHT-100))
         for animation in self.animation_group:

@@ -14,7 +14,7 @@ class Shockwave(pygame.sprite.Sprite):
         self.growth_rate = 50
         self.rect = pygame.Rect(x, y, self.w, self.d)
         
-    def update(self, scroll, fps):
+    def update(self, player, scroll, fps):
         # Increase the size of the shockwave
         self.w += self.growth_rate
         self.d += self.growth_rate
