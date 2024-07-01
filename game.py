@@ -33,7 +33,7 @@ class Game():
         self.grid           = False
         self.can_scroll     = True
         self.screen_shake   = 0        
-        self.scroll         = 20
+        self.scroll         = 9820
         self.level_id       = level_id
         self.aux_count      = 0
         self.timer          = pygame.time.get_ticks() 
@@ -205,7 +205,9 @@ class Game():
                         for enemy in self.enemies_group:
                             if 0 < enemy.rect.right and enemy.rect.left < SCREEN_WIDTH:
                                 webnet = Webnet(enemy.rect.centerx, enemy.rect.top - enemy.rect.height - 350)
-                                if not enemy.boss: self.projectile_group.add(webnet)
+                                if not enemy.boss: 
+                                    self.projectile_group.add(webnet)
+                                    self.characters_group.add(webnet)
                                 # print(f"Webnet created at {enemy.rect.centerx}")
                     self.player.events.remove(event)
                 if event_type == 'shockwave':
@@ -222,6 +224,7 @@ class Game():
                 if enemy.boss and enemy.current_action == 'INTRO':
                     if enemy.name == 'Juggernaut' and enemy.current_frame == 7: 
                         self.screen_shake = 10
+
                 # Events
                 for event in enemy.events:
                     event_type  = event[0]

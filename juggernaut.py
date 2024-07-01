@@ -91,7 +91,7 @@ class Juggernaut(pygame.sprite.Sprite):
                 self.current_frame = 0
                 self.current_action = 'SLAM'
                 self.disabled = True          
-                self.attack_window = 500                
+                self.attack_window = 250                
             else:
                 self.walking_dir = "BACK"
                 self.walking = True
@@ -103,10 +103,13 @@ class Juggernaut(pygame.sprite.Sprite):
 
         # Check if close to edge of the screen
         x_error = 0
-        if self.rect.centerx <= 200:
-            x_error = 200 - self.rect.centerx
-        elif self.rect.centerx >= 1100:
-            x_error = 1100 - self.rect.centerx
+        if self.rect.centerx <= 200 or self.rect.centerx >= 1200 :
+            self.attacking = 1
+            self.current_frame = 0
+            self.current_action = 'SPECIAL'
+            self.disabled = True          
+            self.attack_window = 500
+
         if x_error != 0:
             self.walking = False
             self.rect.x += x_error
@@ -117,7 +120,7 @@ class Juggernaut(pygame.sprite.Sprite):
             self.walking = True
             self.rect.y += self.speed/2
          # Move down
-        elif self.distance_y < 1:
+        elif self.distance_y < 1: 
             self.walking = True
             self.rect.y -= self.speed/2
         
@@ -146,7 +149,7 @@ class Juggernaut(pygame.sprite.Sprite):
             self.current_frame = 0
             self.current_action = random.choice(['ATTACK1','ATTACK2','ATTACK3'])
             self.disabled = True          
-            self.attack_window = 500
+            self.attack_window = 250
 
         # Getting hit        
         # By player
@@ -198,6 +201,8 @@ class Juggernaut(pygame.sprite.Sprite):
                 if self.current_action == 'SPECIAL': 
                     self.rect.x += 25 * (-1 if self.flip else 1)
                 elif self.current_action == 'SLAM' and self.current_frame == 4: 
+                    self.events.append( ('dust', (self.rect.midbottom[0]-200, self.rect.midbottom[1]-60)) )      
+                elif self.current_action == 'ATTACK3' and self.current_frame == 5: 
                     self.events.append( ('dust', (self.rect.midbottom[0]-200, self.rect.midbottom[1]-60)) )      
                 elif self.current_action == 'INTRO':
                     self.rect.y += 70 

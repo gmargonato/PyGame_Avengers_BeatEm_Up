@@ -26,10 +26,9 @@ class Main():
 
         # Temporary code to boot directly into the game state
         if initial_state == 'game':
-            # player = Captain(w=160,h=230, x=SCREEN_WIDTH/2, y=550, stance=1, action='IDLE', hp=50, score=10000)
+            # player = Captain(w=160,h=230, x=SCREEN_WIDTH/2, y=550, stance=1, action='IDLE', hp=5, score=10000)
             player = Hulk(w=160,   h=230, x=SCREEN_WIDTH/2, y=550, action='IDLE', hp=5, score=10000)
             # player = Spider(w=160, h=230, x=SCREEN_WIDTH/2, y=550, action='IDLE', hp=5, score=10000)
-            # player = Thor(w=160,   h=230, x=SCREEN_WIDTH/2, y=550, action='IDLE', hp=5, score=10000)
             self.states['game'] = Game(player, 1, self.fps, self.display)
             
         self.current_state = initial_state
