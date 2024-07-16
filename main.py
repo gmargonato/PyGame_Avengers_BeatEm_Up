@@ -1,7 +1,7 @@
 
 import pygame
 import sys
-import pretty_errors
+#import pretty_errors
 from utils import *
 from menu import *
 from cutscene import *
