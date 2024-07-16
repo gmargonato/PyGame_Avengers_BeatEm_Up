@@ -33,7 +33,7 @@ class Game():
         self.grid           = False
         self.can_scroll     = True
         self.screen_shake   = 0        
-        self.scroll         = 9820
+        self.scroll         = 20
         self.level_id       = level_id
         self.aux_count      = 0
         self.timer          = pygame.time.get_ticks() 
